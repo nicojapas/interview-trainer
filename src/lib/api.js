@@ -25,7 +25,11 @@ export async function login(password) {
 }
 
 export async function loadQuestions() {
-  const res = await fetch('/api/questions')
+  const res = await fetch('/api/questions', {
+    headers: {
+      'Authorization': `Bearer ${getToken()}`
+    }
+  })
   if (!res.ok) throw new Error('Failed to load questions')
   return await res.json()
 }
