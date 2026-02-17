@@ -163,7 +163,7 @@ export default function Terminal() {
         break
 
       case 'SHOW_RESULT':
-        handleResultAction(input)
+        await handleResultAction(input)
         break
 
       case 'COMPLETE':
