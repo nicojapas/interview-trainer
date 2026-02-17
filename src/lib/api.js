@@ -34,14 +34,14 @@ export async function loadQuestions() {
   return await res.json()
 }
 
-export async function getAiExplanation(question, options) {
+export async function getAiExplanation(questionId, question, options) {
   const res = await fetch('/api/gemini', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${getToken()}`
     },
-    body: JSON.stringify({ question, options })
+    body: JSON.stringify({ questionId, question, options })
   })
   if (!res.ok) {
     if (res.status === 401) {

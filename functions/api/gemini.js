@@ -1,5 +1,6 @@
 export async function onRequestPost(context) {
   const apiKey = context.env.GOOGLE_API_KEY
+  const db = context.env.DB
 
   if (!apiKey) {
     return new Response(JSON.stringify({ error: 'API key not configured' }), {
@@ -9,7 +10,7 @@ export async function onRequestPost(context) {
   }
 
   try {
-    const { question, options } = await context.request.json()
+    const { questionId, question, options } = await context.request.json()
 
     const response = await fetch(
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent',
@@ -45,6 +46,18 @@ Options: ${options.join(', ')}`
 
     const data = await response.json()
     const explanation = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No explanation generated.'
+
+    // Save the explanation to the database for future use
+    if (db && questionId && explanation !== 'No explanation generated.') {
+      try {
+        await db.prepare(
+          'UPDATE questions SET learn = ? WHERE external_id = ?'
+        ).bind(explanation, questionId).run()
+      } catch (dbError) {
+        // Log error but don't fail the request - the user still gets their explanation
+        console.error('Failed to save learn content:', dbError)
+      }
+    }
 
     return new Response(JSON.stringify({ explanation }), {
       status: 200,

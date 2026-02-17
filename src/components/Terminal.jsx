@@ -370,7 +370,7 @@ export default function Terminal() {
       term.writeln('Loading explanation...')
 
       try {
-        const learn = question.learn || await getAiExplanation(question.question, question.options)
+        const learn = question.learn || await getAiExplanation(question.id, question.question, question.options)
         term.writeln('')
         term.writeln(learn)
       } catch (err) {
