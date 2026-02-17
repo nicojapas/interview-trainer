@@ -1,0 +1,13 @@
+name = "interview-trainer"
+compatibility_date = "2024-01-01"
+
+# Pages configuration is mostly handled by CLI
+# This file is optional but helps wrangler dev load .env variables
+
+# For local development, wrangler will read from .env file
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "interview-trainer-db"
+database_id = "9808a208-cb58-45dc-afaf-5460baa23b45"
