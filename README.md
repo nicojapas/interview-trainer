@@ -1,100 +1,86 @@
-# Interview Trainer - Web Version
+# Interview Trainer
 
-Terminal-style interview prep application with xterm.js frontend and Cloudflare Pages deployment.
+A terminal-style interview preparation app that quizzes you on software engineering topics with AI-powered explanations.
 
-## Setup
+## Features
 
-1. Install dependencies:
+- **Terminal UI** — Retro terminal interface built with xterm.js for a unique, distraction-free experience
+- **500+ Questions** — Covers backend, frontend, REST APIs, databases, system design, and more
+- **AI Explanations** — Google Gemini integration provides detailed explanations on demand
+- **Serverless Architecture** — Deployed on Cloudflare's edge network for fast global access
+- **D1 Database** — Questions stored in Cloudflare's distributed SQLite database
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Frontend | React 18, xterm.js |
+| Backend | Cloudflare Pages Functions |
+| Database | Cloudflare D1 (SQLite) |
+| AI | Google Gemini API |
+| Build | Vite |
+
+## Architecture
+
+```
+┌─────────────────┐     ┌──────────────────────────────────────┐
+│                 │     │         Cloudflare Edge              │
+│  React + xterm  │────►│  ┌─────────────┐  ┌──────────────┐   │
+│                 │     │  │   Pages     │  │     D1       │   │
+└─────────────────┘     │  │  Functions  │──│   Database   │   │
+                        │  └─────────────┘  └──────────────┘   │
+                        │         │                            │
+                        │         ▼                            │
+                        │  ┌─────────────┐                     │
+                        │  │   Gemini    │                     │
+                        │  │     API     │                     │
+                        │  └─────────────┘                     │
+                        └──────────────────────────────────────┘
+```
+
+## Local Development
+
 ```bash
+# Install dependencies
 npm install
-```
 
-2. Create `.env` file:
-```bash
+# Configure environment
 cp .env.example .env
-```
+# Edit .env with your AUTH_PASSWORD and GOOGLE_API_KEY
 
-Edit `.env` and set:
-- `AUTH_PASSWORD` - Password for accessing the app
-- `GOOGLE_API_KEY` - Your Google Gemini API key
-
-3. Run development server:
-```bash
+# Start dev server
 npm run dev
 ```
 
-Visit http://localhost:5173
+## Deployment
 
-## Building for Production
+Deploy to Cloudflare Pages:
 
 ```bash
-npm run build
-```
-
-Output will be in `dist/`
-
-## Deployment to Cloudflare Pages
-
-### Option 1: CLI Deployment
-
-1. Install Wrangler:
-```bash
-npm install -g wrangler
-```
-
-2. Login to Cloudflare:
-```bash
-wrangler login
-```
-
-3. Set environment variables:
-```bash
+# Set secrets
 npx wrangler pages secret put AUTH_PASSWORD
 npx wrangler pages secret put GOOGLE_API_KEY
+
+# Deploy
+npm run build && npx wrangler pages deploy dist
 ```
-
-4. Deploy:
-```bash
-npm run build
-npx wrangler pages deploy dist --project-name=interview-trainer
-```
-
-### Option 2: GitHub Integration
-
-1. Push this repo to GitHub
-2. Go to Cloudflare Dashboard → Pages → Create a project
-3. Connect your GitHub repo
-4. Build settings:
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-5. Add environment variables in Cloudflare dashboard:
-   - `AUTH_PASSWORD`
-   - `GOOGLE_API_KEY`
 
 ## Project Structure
 
 ```
-├── src/                    # Frontend React app
-│   ├── components/         # Terminal and Auth components
-│   ├── lib/                # API client
-│   └── App.jsx             # Main app
-├── functions/              # Cloudflare Pages Functions
-│   ├── api/                # API endpoints
-│   └── _middleware.js      # Auth middleware
-├── migrations/             # D1 database migrations
-└── public/                 # Static assets
+src/
+├── components/
+│   ├── Terminal.jsx    # Quiz UI with xterm.js
+│   └── Auth.jsx        # Login form
+└── lib/
+    └── api.js          # API client
+
+functions/
+├── api/
+│   ├── auth.js         # POST /api/auth
+│   ├── questions.js    # GET /api/questions
+│   └── gemini.js       # POST /api/gemini
+└── _middleware.js      # Token validation
+
+migrations/             # D1 schema and seed data
 ```
-
-## Authentication
-
-Simple password-based auth:
-- User enters password on login page
-- Token stored in localStorage
-- All `/api/*` endpoints (except `/api/auth`) require Bearer token
-- Token validated by middleware
-
-## API Endpoints
-
-- `POST /api/auth` - Login (returns token)
-- `POST /api/gemini` - Get AI explanation (requires auth)
-- `GET /api/questions` - Get questions from D1 database
