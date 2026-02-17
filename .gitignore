@@ -1,10 +1,5 @@
-# Local settings - DO NOT COMMIT
-localconfig.py
+# Secrets - DO NOT COMMIT
 .env
-
-# Python
-__pycache__
-.venv
 
 # Node
 node_modules/

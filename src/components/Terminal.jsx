@@ -372,7 +372,8 @@ export default function Terminal() {
       try {
         const learn = question.learn || await getAiExplanation(question.id, question.question, question.options)
         term.writeln('')
-        term.writeln(learn)
+        // Split by newlines and write each line for proper terminal formatting
+        learn.split('\n').forEach(line => term.writeln(line))
       } catch (err) {
         term.writeln('')
         term.writeln(`Error: ${err.message}`)

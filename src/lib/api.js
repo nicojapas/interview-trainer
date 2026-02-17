@@ -30,7 +30,13 @@ export async function loadQuestions() {
       'Authorization': `Bearer ${getToken()}`
     }
   })
-  if (!res.ok) throw new Error('Failed to load questions')
+  if (!res.ok) {
+    if (res.status === 401) {
+      clearToken()
+      throw new Error('Unauthorized')
+    }
+    throw new Error('Failed to load questions')
+  }
   return await res.json()
 }
 

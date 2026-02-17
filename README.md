@@ -48,8 +48,8 @@ npm install
 cp .env.example .env
 # Edit .env with your AUTH_PASSWORD and GOOGLE_API_KEY
 
-# Start dev server
-npm run dev
+# Start dev server with functions
+npm run dev:functions
 ```
 
 ## Deployment

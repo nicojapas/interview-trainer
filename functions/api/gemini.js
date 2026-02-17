@@ -13,7 +13,7 @@ export async function onRequestPost(context) {
     const { questionId, question, options } = await context.request.json()
 
     const response = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent',
+      'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent',
       {
         method: 'POST',
         headers: {
@@ -38,17 +38,32 @@ Options: ${options.join(', ')}`
           }],
           generationConfig: {
             temperature: 0.5,
-            maxOutputTokens: 500,
+            maxOutputTokens: 1024,
           }
         })
       }
     )
 
     const data = await response.json()
-    const explanation = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No explanation generated.'
+
+    if (!response.ok) {
+      const errorMessage = data.error?.message || JSON.stringify(data)
+      return new Response(JSON.stringify({ error: `Gemini API error: ${errorMessage}` }), {
+        status: response.status,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    }
+
+    const explanation = data.candidates?.[0]?.content?.parts?.[0]?.text
+    if (!explanation) {
+      return new Response(JSON.stringify({ error: 'No explanation in Gemini response', debug: data }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    }
 
     // Save the explanation to the database for future use
-    if (db && questionId && explanation !== 'No explanation generated.') {
+    if (db && questionId) {
       try {
         await db.prepare(
           'UPDATE questions SET learn = ? WHERE external_id = ?'
