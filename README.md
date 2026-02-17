@@ -54,7 +54,19 @@ npm run dev
 
 ## Deployment
 
-Deploy to Cloudflare Pages:
+### 1. Create D1 Database
+
+```bash
+# Create the database
+npx wrangler d1 create interview-trainer-db
+
+# Copy the database_id from the output and update wrangler.toml
+
+# Run migrations
+npx wrangler d1 migrations apply interview-trainer-db --remote
+```
+
+### 2. Deploy to Cloudflare Pages
 
 ```bash
 # Set secrets
@@ -64,6 +76,12 @@ npx wrangler pages secret put GOOGLE_API_KEY
 # Deploy
 npm run build && npx wrangler pages deploy dist
 ```
+
+### 3. Bind Database to Pages Project
+
+In Cloudflare Dashboard → Pages → your project → Settings → Functions → D1 Database bindings:
+- Variable name: `DB`
+- D1 database: `interview-trainer-db`
 
 ## Project Structure
 
